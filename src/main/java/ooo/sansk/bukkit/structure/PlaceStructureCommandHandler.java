@@ -1,6 +1,7 @@
 package ooo.sansk.bukkit.structure;
 
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.structure.Mirror;
 import org.bukkit.block.structure.StructureRotation;
 import org.bukkit.command.Command;
@@ -9,6 +10,7 @@ import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.structure.Structure;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -28,16 +30,10 @@ public class PlaceStructureCommandHandler implements TabExecutor {
         if (args.length < 1) {
             return false;
         }
-        String structureName = args[0];
-
-        if (structureName.contains("//")) {
-            sender.sendMessage("Structure names can not contain \"//\"");
-            return true;
-        }
 
         boolean includeEntities = true;
         if (args.length > 1) {
-            if(!"true".equalsIgnoreCase(args[1]) && !"false".equalsIgnoreCase(args[1])) {
+            if (!"true".equalsIgnoreCase(args[1]) && !"false".equalsIgnoreCase(args[1])) {
                 sender.sendMessage("\"" + args[1] + "\" is not a valid boolean");
                 return true;
             }
@@ -74,7 +70,7 @@ public class PlaceStructureCommandHandler implements TabExecutor {
             }
         }
 
-        if(integrity < 0F || integrity > 1F) {
+        if (integrity < 0F || integrity > 1F) {
             sender.sendMessage("Integrity must be between 0 and 1 (inclusive)");
             return true;
         }
@@ -89,19 +85,31 @@ public class PlaceStructureCommandHandler implements TabExecutor {
             }
         }
 
-        final Structure structure = Bukkit.getServer().getStructureManager().load(structureName);
+        Structure structure;
+        if (args[0].startsWith("file::")) {
+            structure = Bukkit.getServer().getStructureManager().load(new File(args[0].substring(6)));
+        } else {
+            NamespacedKey structureKey = NamespacedKey.fromString(args[0]);
+            if (structureKey.getKey().contains("//")) {
+                sender.sendMessage("Structure names can not contain \"//\"");
+                return true;
+            }
+            structure = Bukkit.getServer().getStructureManager().load(structureKey);
+        }
+
+
         if (structure == null) {
-            sender.sendMessage("Structure \"" + structureName + "\" not found.");
+            sender.sendMessage("Structure \"" + args[0] + "\" not found.");
             return true;
         }
 
-        if(palette >= structure.getPalettes().size()) {
+        if (palette >= structure.getPalettes().size()) {
             sender.sendMessage("Invalid structure palette. Highest possible index is " + structure.getPalettes().size());
             return true;
         }
 
         structure.place(player.getLocation(), includeEntities, rotation, mirror, palette, integrity, new Random());
-        sender.sendMessage("Placed \"" + structure.getName() + "\"");
+        sender.sendMessage("Placed \"" + args[0] + "\"");
         return true;
     }
 

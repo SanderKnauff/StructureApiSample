@@ -1,6 +1,5 @@
 package ooo.sansk.bukkit.structure;
 
-import org.bukkit.Bukkit;
 import org.bukkit.block.structure.Mirror;
 import org.bukkit.block.structure.StructureRotation;
 import org.bukkit.command.Command;
@@ -35,7 +34,7 @@ public class PasteCommandHandler implements TabExecutor {
 
         boolean includeEntities = true;
         if (args.length > 0) {
-            if(!"true".equalsIgnoreCase(args[0]) && !"false".equalsIgnoreCase(args[1])) {
+            if (!"true".equalsIgnoreCase(args[0]) && !"false".equalsIgnoreCase(args[1])) {
                 sender.sendMessage("\"" + args[0] + "\" is not a valid boolean");
                 return true;
             }
@@ -72,7 +71,7 @@ public class PasteCommandHandler implements TabExecutor {
             }
         }
 
-        if(integrity < 0F || integrity > 1F) {
+        if (integrity < 0F || integrity > 1F) {
             sender.sendMessage("Integrity must be between 0 and 1 (inclusive)");
             return true;
         }
@@ -93,13 +92,13 @@ public class PasteCommandHandler implements TabExecutor {
             return true;
         }
 
-        if(palette >= structure.getPalettes().size()) {
+        if (palette >= structure.getPalettes().size()) {
             sender.sendMessage("Invalid structure palette. Highest possible index is " + structure.getPalettes().size());
             return true;
         }
 
         structure.place(player.getLocation(), includeEntities, rotation, mirror, palette, integrity, new Random());
-        sender.sendMessage("Placed \"" + structure.getName() + "\"");
+        sender.sendMessage("Placed structure from clipboard");
         return true;
     }
 

@@ -2,12 +2,14 @@ package ooo.sansk.bukkit.structure;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.structure.Structure;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -33,7 +35,6 @@ public class CopyCommandHandler implements TabExecutor {
         if (args.length < 7) {
             return false;
         }
-        String structureName = args[0];
 
         int[] coords = new int[6];
         for (int i = 1; i <= 6; i++) {
@@ -66,14 +67,29 @@ public class CopyCommandHandler implements TabExecutor {
         Location corner1 = new Location(player.getWorld(), coords[0], coords[1], coords[2]);
         Location corner2 = new Location(player.getWorld(), coords[3], coords[4], coords[5]);
 
-        sender.sendMessage("Copying: " + structureName);
-        Structure structure = Bukkit.getServer().getStructureManager().save(structureName, corner1, corner2, includeEntities, save);
+        sender.sendMessage("Copying: " + args[0]);
+        Structure structure = Bukkit.getServer().getStructureManager().createStructure();
+        structure.fill(corner1, corner2, includeEntities);
+
+        if (save) {
+            if (args[0].startsWith("file::")) {
+                sender.sendMessage("Copying: " + args[0]);
+                Bukkit.getServer().getStructureManager().save(new File(args[0].substring(6)), structure);
+            } else {
+                NamespacedKey structureKey = NamespacedKey.fromString(args[0]);
+                if (structureKey.getKey().contains("//")) {
+                    sender.sendMessage("Structure names can not contain \"//\"");
+                    return true;
+                }
+                sender.sendMessage("Copying: " + args[0]);
+            }
+        }
         clipboard.put(player.getUniqueId(), structure);
 
         if (save) {
-            sender.sendMessage("Copied and saved structure: " + structureName);
+            sender.sendMessage("Copied and saved structure: " + args[0]);
         } else {
-            sender.sendMessage("Copied structure: " + structureName);
+            sender.sendMessage("Copied structure: " + args[0]);
         }
 
         return true;
