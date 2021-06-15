@@ -67,7 +67,6 @@ public class CopyCommandHandler implements TabExecutor {
         Location corner1 = new Location(player.getWorld(), coords[0], coords[1], coords[2]);
         Location corner2 = new Location(player.getWorld(), coords[3], coords[4], coords[5]);
 
-        sender.sendMessage("Copying: " + args[0]);
         Structure structure = Bukkit.getServer().getStructureManager().createStructure();
         structure.fill(corner1, corner2, includeEntities);
 
@@ -82,6 +81,7 @@ public class CopyCommandHandler implements TabExecutor {
                     return true;
                 }
                 sender.sendMessage("Copying: " + args[0]);
+                Bukkit.getServer().getStructureManager().save(structureKey, structure);
             }
         }
         clipboard.put(player.getUniqueId(), structure);
