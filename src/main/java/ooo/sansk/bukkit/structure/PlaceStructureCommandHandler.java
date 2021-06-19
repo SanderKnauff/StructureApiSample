@@ -11,6 +11,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.structure.Structure;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -18,6 +20,12 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 public class PlaceStructureCommandHandler implements TabExecutor {
+
+    private final StructureApiSamplePlugin structureApiSamplePlugin;
+
+    public PlaceStructureCommandHandler(StructureApiSamplePlugin structureApiSamplePlugin) {
+        this.structureApiSamplePlugin = structureApiSamplePlugin;
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String alias, String[] args) {
@@ -88,6 +96,18 @@ public class PlaceStructureCommandHandler implements TabExecutor {
         Structure structure;
         if (args[0].startsWith("file::")) {
             structure = Bukkit.getServer().getStructureManager().load(new File(args[0].substring(6)));
+        } else if (args[0].startsWith("classpath::")) {
+            try {
+                structure = Bukkit.getServer().getStructureManager().load(structureApiSamplePlugin.getResource(args[0].substring(11)));
+            } catch (IOException ioException) {
+                structure = null;
+            }
+        }  else if (args[0].startsWith("url::")) {
+            try {
+                structure = Bukkit.getServer().getStructureManager().load(new URL(args[0].substring(5)).openStream());
+            } catch (IOException ioException) {
+                structure = null;
+            }
         } else {
             NamespacedKey structureKey = NamespacedKey.fromString(args[0]);
             if (structureKey.getKey().contains("//")) {
