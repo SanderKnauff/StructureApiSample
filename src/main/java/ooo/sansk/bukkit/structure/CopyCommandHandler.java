@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.structure.Structure;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -73,7 +74,12 @@ public class CopyCommandHandler implements TabExecutor {
         if (save) {
             if (args[0].startsWith("file::")) {
                 sender.sendMessage("Copying: " + args[0]);
-                Bukkit.getServer().getStructureManager().save(new File(args[0].substring(6)), structure);
+                try {
+                    Bukkit.getServer().getStructureManager().saveStructure(new File(args[0].substring(6)), structure);
+                } catch (IOException ioException) {
+                    sender.sendMessage("Failed saving structure to " + args[0]);
+                    ioException.printStackTrace();
+                }
             } else {
                 NamespacedKey structureKey = NamespacedKey.fromString(args[0]);
                 if (structureKey.getKey().contains("//")) {
@@ -81,7 +87,11 @@ public class CopyCommandHandler implements TabExecutor {
                     return true;
                 }
                 sender.sendMessage("Copying: " + args[0]);
-                Bukkit.getServer().getStructureManager().save(structureKey, structure);
+                try {
+                    Bukkit.getServer().getStructureManager().saveStructure(structureKey, structure);
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
             }
         }
         clipboard.put(player.getUniqueId(), structure);
@@ -98,7 +108,7 @@ public class CopyCommandHandler implements TabExecutor {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (!(sender instanceof Player)) {
-            return null;
+            return Collections.emptyList();
         }
         Player player = (Player) sender;
 
@@ -116,7 +126,7 @@ public class CopyCommandHandler implements TabExecutor {
             case 9:
                 return Arrays.asList("true", "false");
             default:
-                return null;
+                return Collections.emptyList();
         }
     }
 }
