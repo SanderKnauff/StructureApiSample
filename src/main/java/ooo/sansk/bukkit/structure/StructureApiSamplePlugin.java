@@ -1,5 +1,6 @@
 package ooo.sansk.bukkit.structure;
 
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.annotation.command.Command;
 import org.bukkit.plugin.java.annotation.plugin.ApiVersion;
@@ -18,6 +19,7 @@ import java.util.UUID;
 @Command(name = "deletestructure", usage = "/deletestructure <StructureName> <keepLoaded>")
 @Command(name = "liststructures", usage = "/liststructures")
 @Command(name = "cloneStructure", usage = "/cloneStructure <StructureName> <target>")
+@Command(name = "describestructure", usage = "/describestructure <StructureName>")
 @ApiVersion(ApiVersion.Target.v1_13)
 public class StructureApiSamplePlugin extends JavaPlugin {
 
@@ -31,5 +33,8 @@ public class StructureApiSamplePlugin extends JavaPlugin {
         getCommand("liststructures").setExecutor(new ListStructuresCommandHandler());
         getCommand("loadstructure").setExecutor(new LoadStructureCommandHandler(this));
         getCommand("cloneStructure").setExecutor(new CloneCommandHandler());
+        getCommand("describestructure").setExecutor(new DescribeStructureCommandHandler());
+
+//        Bukkit.getServer().getWorlds().get(0).getPopulators().add(new ShipSpammerPopulator());
     }
 }
